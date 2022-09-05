@@ -45,30 +45,30 @@ public class IR {
     }
 
     class Node{  
-        Operation item;  
+        Operation op;  
         Node previous;  
         Node next;  
    
-        public Node(Operation item) {  
-            this.item = item;  
+        public Node(Operation op) {  
+            this.op = op;  
         }  
     }  
     
     Node head, tail = null;  
    
-    public void addNode(Operation item) {  
+    public void addNode(Operation op) {  
 
-        Node newNode = new Node(item);  
+        Node nnode = new Node(op);  
 
         if(head == null) {  
-            head = tail = newNode;  
+            head = tail = node;  
             head.previous = null;  
             tail.next = null;  
         }  
         else {  
-            tail.next = newNode;   
-            newNode.previous = tail;  
-            tail = newNode;  
+            tail.next = node;   
+            node.previous = tail;  
+            tail = node;  
             tail.next = null;  
         }  
     }
@@ -83,7 +83,7 @@ public class IR {
         }  
         
         while(current != null) {  
-            System.out.println(current.item.opcode + " [ " + current.item.SR1 + " ], " + " [ " + current.item.SR2 + " ], " + " [ " + current.item.SR3 + " ]");  
+            System.out.println(current.op.opcode + " [ " + current.op.SR1 + " ], " + " [ " + current.op.SR2 + " ], " + " [ " + current.op.SR3 + " ]");  
             current = current.next;  
         }  
     } 

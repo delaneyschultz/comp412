@@ -42,6 +42,8 @@ public class Main {
 
     public static void main (String[] args){
 
+        long startTime = System.nanoTime();
+
         boolean hflag = false;
         boolean sflag = false;
         boolean pflag = false;
@@ -127,6 +129,12 @@ public class Main {
             }
             
         }
+        long endTime = System.nanoTime();
+
+        long duration = (endTime - startTime);
+        System.out.println("Time: " + duration);
+
+        System.out.println("Time: " + (duration/1000000000));
         
     }
 }
