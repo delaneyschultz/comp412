@@ -96,7 +96,22 @@ public class Main {
             }
 
             if (names.equals("") && namep.equals("") && namer.equals("") && hflag == false){
-                //do nothing
+                //default behavior
+                if (args.length != 0){
+
+                    namep = namep = args[0];
+                    Parser parser= new Parser();
+                            
+                    try{
+                        int flagp = 0;
+                        parser.parse(namep, flagp);
+    
+                    }
+                    catch (Exception e){
+                       System.out.println("ERROR: cannot open file");
+                    }
+
+                }
             }
             else if (hflag == true){
                     System.out.println("Required arguments:");

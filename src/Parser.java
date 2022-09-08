@@ -55,7 +55,7 @@ public class Parser extends IR{
                                 break;
                             }
                             else{
-                                op.setSR1(word.getLexeme());
+                                op.setSR1("s" + word.getLexeme());
                                 word = scanner.next_token(line, opcode);
                                 if (word.getError() == true){
                                     error = true;
@@ -83,7 +83,7 @@ public class Parser extends IR{
                                     break;
                                 }
                                 else{
-                                    op.setSR3(word.getLexeme());
+                                    op.setSR3("s" + word.getLexeme());
                                     word = scanner.next_token(line, opcode);
                                     if (word.getError() == true){
                                         error = true;
@@ -117,7 +117,7 @@ public class Parser extends IR{
                                 break;
                             }
                             else{
-                                op.setSR1(word.getLexeme());
+                                op.setSR1("val " + word.getLexeme());
                                 word = scanner.next_token(line, opcode);
                                 if (word.getError() == true){
                                     error = true;
@@ -146,7 +146,7 @@ public class Parser extends IR{
                                     break;
                                 }
                                 else{
-                                    op.setSR3(word.getLexeme());
+                                    op.setSR3("s" + word.getLexeme());
                                     word = scanner.next_token(line, opcode);
                                     if (word.getError() == true){
                                         error = true;
@@ -181,7 +181,7 @@ public class Parser extends IR{
                                 break;
                             }
                             else{
-                                op.setSR1(word.getLexeme());
+                                op.setSR1("s" + word.getLexeme());
                                 word = scanner.next_token(line, opcode);
                                 if (word.getError() == true){
                                     error = true;
@@ -209,7 +209,7 @@ public class Parser extends IR{
                                 break;
                                 }
                                 else{
-                                    op.setSR2(word.getLexeme());
+                                    op.setSR2("s" + word.getLexeme());
                                     word = scanner.next_token(line, opcode);
                                     if (word.getError() == true){
                                         error = true;
@@ -237,7 +237,7 @@ public class Parser extends IR{
                                         break;
                                     }
                                     else{
-                                        op.setSR3(word.getLexeme());
+                                        op.setSR3("s" + word.getLexeme());
                                         word = scanner.next_token(line, opcode);
                                         if (word.getError() == true){
                                             error = true;
@@ -276,7 +276,7 @@ public class Parser extends IR{
                                 break;
                             }
                             else{
-                                op.setSR1(word.getLexeme());
+                                op.setSR1("val " + word.getLexeme());
                                 word = scanner.next_token(line, opcode);
                                 if (word.getError() == true){
                                     error = true;
@@ -294,9 +294,9 @@ public class Parser extends IR{
                             }
                             break;
                         case "NOP":
-                            word = scanner.next_token(line, opcode);
                             op_num += 1;
                             op.setOp(word.getLexeme());
+                            word = scanner.next_token(line, opcode);
                             if (!word.getCategory().equals("NEWLINE") && !word.getCategory().equals("SKIP")){
                                 System.out.print("ERROR " + scanner.getLine());
                                 System.out.println(":        " + "Extra token at end of line " + word.getLexeme());
