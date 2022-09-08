@@ -1,3 +1,4 @@
+
 JFLAGS = -g
 JC = javac
 .SUFFIXES: .java .class
@@ -12,11 +13,11 @@ classes = \
 default: classes
 
 clean:
-	$(RM) *.class
+	rm -f *.class
 
 %.class : %.java
     $(JAVAC) $<
 
 build:
-	jar -cvf lab1.jar IR.java IR.class Main.java Main.class Parser.java parser.class Scanner.java Scanner.class Token.java Token.class
-	
+	javac *.java
+	jar cfm lab1-new.jar manifest.txt *.class *.java

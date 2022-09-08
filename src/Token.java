@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Arrays;
-import java.util.List;
+
 
 
 public class Token {
@@ -10,11 +7,13 @@ public class Token {
     public String category;
     public int line_num;
     public boolean opcode;
+    public boolean error;
 
     public Token(int line){
         lexeme = "";
         category = "";
         line_num = line;
+        error = false;
     }
 
     public String getCategory(){
@@ -33,6 +32,15 @@ public class Token {
     public int getLine(){
         return line_num;
     }
+
+    public boolean getError(){
+        return error;
+    }
+
+    public void setError(boolean e){
+        error = e;
+    }
+
 
     public void setCategory(String c){
         category = c;

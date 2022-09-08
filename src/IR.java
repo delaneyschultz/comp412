@@ -1,7 +1,3 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class IR {
@@ -58,7 +54,7 @@ public class IR {
    
     public void addNode(Operation op) {  
 
-        Node nnode = new Node(op);  
+        Node node = new Node(op);  
 
         if(head == null) {  
             head = tail = node;  

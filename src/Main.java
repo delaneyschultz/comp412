@@ -42,7 +42,6 @@ public class Main {
 
     public static void main (String[] args){
 
-        long startTime = System.nanoTime();
 
         boolean hflag = false;
         boolean sflag = false;
@@ -64,15 +63,31 @@ public class Main {
                         break;
                     case "-s":
                         sflag = true;
-                        names = args[i+1];
+                        if (i != (args.length-1)){
+                            names = args[i+1];
+                        }
+                        else{
+                            System.out.println("ERROR: bad file name");
+                        }
+                        
                         break;
                     case "-p":
                         pflag = true;
-                        namep = args[i+1];
+                        if (i != (args.length-1)){
+                            namep = args[i+1];
+                        }
+                        else{
+                            System.out.println("ERROR: bad file name");
+                        }
                         break;
                     case "-r":
                         rflag = true;
-                        namer = args[i+1];
+                        if (i != (args.length-1)){
+                            namer = args[i+1];
+                        }
+                        else{
+                            System.out.println("ERROR: bad file name");
+                        }
                         break;
                     default:
                         break;
@@ -80,61 +95,87 @@ public class Main {
 
             }
 
-            if (hflag == true){
-                System.out.println("-h: help");
-                System.out.println("-s: read the file specified by <name> and print, to the standard output stream, a list of the tokens that the scanner found");
-                System.out.println("-p: read the file specified by <name>, scan it and parse it, build the intermediate representation");
-                System.out.println("-r: read the file specified by <name>, scan it, parse it, build the intermediate representation, and print out the information in the intermediate representation");
+            if (names.equals("") && namep.equals("") && namer.equals("") && hflag == false){
+                //do nothing
+            }
+            else if (hflag == true){
+                    System.out.println("Required arguments:");
+                    System.out.println("\tfilename is the pathname (abosulte or relative) to the input file");
+                    System.out.println("Optional flags:");
+                    System.out.println("\t-h\tprints this message");
+                    System.out.println("\t-l\tOpens log file \"./Log\" and starts logging.");
+                    System.out.println("\t-v\tprints version number");
+                    System.out.println("At most one of the following three flags:");
+                    System.out.println("\t-s\tprints tokens in token stream");
+                    System.out.println("\t-p\tinvokes parser and reports on success or failure");
+                    System.out.println("\t-r\tprints human readable version of parser's IR");
             }
             else{
-                if (sflag == true){
-                    if (names == ""){
-                        System.out.println("No file name found.");
-                    }
-                    else{
-                        try{
-                            scan_file(names);
-                        }
-                        catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        
-                    }
-                    
+                if (hflag == true){
+                    System.out.println("Required arguments:");
+                    System.out.println("\tfilename is the pathname (abosulte or relative) to the input file");
+                    System.out.println("Optional flags:");
+                    System.out.println("\t-h\tprints this message");
+                    System.out.println("\t-l\tOpens log file \"./Log\" and starts logging.");
+                    System.out.println("\t-v\tprints version number");
+                    System.out.println("At most one of the following three flags:");
+                    System.out.println("\t-s\tprints tokens in token stream");
+                    System.out.println("\t-p\tinvokes parser and reports on success or failure");
+                    System.out.println("\t-r\tprints human readable version of parser's IR");
                 }
                 else{
-                    if (pflag == true){
-                        Parser parser= new Parser();
-                        try{
-                            int flagp = 0;
-                            parser.parse(namep, flagp);
-        
+                    if (sflag == true){
+                        if (names == ""){
+                            System.out.println("No file name found.");
                         }
-                        catch (Exception e){
-                           e.printStackTrace();
+                        else{
+                            try{
+                                scan_file(names);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            
                         }
                         
                     }
-                    else if(rflag == true){
-                        Parser parser= new Parser();
-                        try{
-                            int flagr = 1;
-                            parser.parse(namer, flagr);
+                    else{
+                        if (pflag == true){
+                            Parser parser= new Parser();
+                            
+                            try{
+                                int flagp = 0;
+                                parser.parse(namep, flagp);
+            
+                            }
+                            catch (Exception e){
+                               System.out.println("ERROR: cannot open file");
+                            }
+                            
                         }
-                        catch (Exception e){
-                           e.printStackTrace();
+                        else if(rflag == true){
+                            Parser parser= new Parser();
+                            try{
+                                int flagr = 1;
+                                parser.parse(namer, flagr);
+                            }
+                            catch (Exception e){
+                                System.out.println("ERROR: cannot open file");
+                            }
                         }
                     }
                 }
-            }
+            } 
+            
+
+
+            
+
+
             
         }
-        long endTime = System.nanoTime();
+  
 
-        long duration = (endTime - startTime);
-        System.out.println("Time: " + duration);
-
-        System.out.println("Time: " + (duration/1000000000));
         
     }
 }

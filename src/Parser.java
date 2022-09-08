@@ -11,234 +11,397 @@ public class Parser extends IR{
 
     public void parse(String name, int flag) throws Exception{
         Scanner scanner = new Scanner();
-        FileReader file =new FileReader(name);    
-        BufferedReader reader = new BufferedReader(file);
+        try{
+            
+            FileReader file =new FileReader(name);    
+            BufferedReader reader = new BufferedReader(file);
+            boolean found_error = false;
+            String line;  
+            int op_num = 0;
+            int errors = 0;
+            int lines = 0;
 
-        boolean found_error = false;
-        String line;  
-        int op_num = 0;
+            while(reader.ready()){  
+                line = reader.readLine();
+                line += "\n";
+                String op_name;
+                boolean error = false;
+                Token word = scanner.next_token(line, false);
+                if (word.getError() == true){
+                    error = true;
+                    errors += 1;
+                }
 
-        while(reader.ready()){  
-            line = reader.readLine();
-            line += "\n";
-            String op_name;
-            Token word = scanner.next_token(line, false);
-            boolean error = false;
-            boolean opcode = word.getOp();
-
-            while (!(word.getCategory().equals("NEWLINE")) && !(word.getCategory().equals("SKIP")) && error == false){
-                Operation op = new Operation();
                 
-                switch(word.getCategory()){
-                    case "MEMOP":
-                        op_num += 1;
-                        op.setOp(word.getLexeme());
-                        word = scanner.next_token(line, opcode);
+                boolean opcode = word.getOp();
 
-                        if (!(word.getCategory().equals("REG"))){
-                            System.out.println("ERROR " + scanner.getLine() + " Missing source register in load or store.");
-                            error = true;
-                            break;
-                        }
-                        else{
-                            op.setSR1(word.getLexeme());
+                while (!(word.getCategory().equals("NEWLINE")) && !(word.getCategory().equals("SKIP")) && error == false){
+                    Operation op = new Operation();
+                    
+                    switch(word.getCategory()){
+                        case "MEMOP":
+                            op_num += 1;
+                            op.setOp(word.getLexeme());
                             word = scanner.next_token(line, opcode);
-                            
-                         
-                            if (!(word.getCategory().equals("INTO"))){
-                               System.out.println("ERROR " + scanner.getLine() + " Missing '=>' in loadI");
-                               error = true;
-                               break;
-                            }
-                            
-                            word = scanner.next_token(line, opcode);
-
-                            if (!(word.getCategory().equals("REG"))){
-                                System.out.println("ERROR " + scanner.getLine() + " Missing target register in load or store.");
+                            if (word.getError() == true){
                                 error = true;
+                                errors += 1;
+                            }
+                            if (!(word.getCategory().equals("REG"))){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        Missing source register in load or store.");
+                                error = true;
+                                errors += 1;
                                 break;
                             }
                             else{
-                                 op.setSR3(word.getLexeme());
-                                 word = scanner.next_token(line, opcode);
-              
-    
-                                 if (word.getCategory().equals("NEWLINE") || word.getCategory().equals("SKIP")){
-                                     break;
-                                 }
-                                 else{
-                                    
-                                     System.out.println("Error");
-                                 }
-                            }
-                        }
-                        break;
-                    case "LOADI":
-                        op_num += 1;
-                        op.setOp(word.getLexeme());
-                        word = scanner.next_token(line, opcode);
-  
-                        if (!(word.getCategory().equals("CONST"))){
-                            System.out.println("ERROR " + scanner.getLine() + " Missing constant in loadI.");
-                            error = true;
-                            break;
-                        }
-                        else{
-                            op.setSR1(word.getLexeme());
-                            word = scanner.next_token(line, opcode);
- 
-                            if (!(word.getCategory().equals("INTO"))){
-                                System.out.println("ERROR " + scanner.getLine() + " Missing '=>' in loadI");
-                                error = true;
-                                break;
-                            }
-                            
-                            word = scanner.next_token(line, opcode);
-
-                            if (!(word.getCategory().equals("REG"))){
-                                System.out.println("ERROR " + scanner.getLine() + " Missing target register in loadI.");
-                                error = true;
-                                break;
-                            }
-                            else{
-                                 op.setSR3(word.getLexeme());
-                                 word = scanner.next_token(line, opcode);
-
-                                 if (word.getCategory().equals("NEWLINE") || (word.getCategory().equals("SKIP"))){
-                                    
-                                     //do nothing yet
-                                 }
-                                 else{
-                                     System.out.println("Error");
-                                 }
-                            }
-                        }
-                        break;
-                    case "ARITHOP":
-                        op_num += 1;
-                        op.setOp(word.getLexeme());
-                        op_name = word.getLexeme();
-                        word = scanner.next_token(line, opcode);
-                        
-                        if (!(word.getCategory().equals("REG"))){
-                            System.out.println("ERROR " + scanner.getLine() + " Missing first source register in " + op_name + ".");
-                            error = true;
-                            break;
-                        }
-                        else{
-                            op.setSR1(word.getLexeme());
-                            word = scanner.next_token(line, opcode);
-
-                            if (!(word.getCategory().equals("COMMA"))){
-                                System.out.println("ERROR " + scanner.getLine() + " Missing comma in " + op_name + ".");
-                                error = true;
-                                break;
-                            }
-                            word = scanner.next_token(line, opcode);
-
-                            if (!(word.getCategory().equals("REG"))){
-                               System.out.println("ERROR " + scanner.getLine() + " Missing second source register in " + op_name + ".");
-                               error = true;
-                               break;
-                            }
-                            else{
-                                op.setSR2(word.getLexeme());
+                                op.setSR1(word.getLexeme());
                                 word = scanner.next_token(line, opcode);
-
-                                if (!(word.getCategory().equals("INTO"))){
-                                    System.out.println("ERROR " + scanner.getLine() + " Missing '=>' in loadI");
+                                if (word.getError() == true){
                                     error = true;
-                                    break;
+                                    errors += 1;
                                 }
-                                word = scanner.next_token(line,opcode);
-
-                                if (!(word.getCategory().equals("REG"))){
-                                    System.out.println("ERROR " + scanner.getLine() + " Missing target register in " + op_name);
+            
+                                if (!(word.getCategory().equals("INTO"))){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        Missing '=>' in loadI");
+                                error = true;
+                                errors += 1;
+                                break;
+                                }
+                                
+                                word = scanner.next_token(line, opcode);
+                                if (word.getError() == true){
                                     error = true;
+                                    errors += 1;
+                                }
+                                if (!(word.getCategory().equals("REG"))){
+                                    System.out.print("ERROR " + scanner.getLine());
+                                    System.out.println(":        " + "Missing target register in load or store.");
+                                    error = true;
+                                    errors += 1;
                                     break;
                                 }
                                 else{
                                     op.setSR3(word.getLexeme());
                                     word = scanner.next_token(line, opcode);
-                                    
+                                    if (word.getError() == true){
+                                        error = true;
+                                        errors += 1;
+                                    }
+        
                                     if (word.getCategory().equals("NEWLINE") || word.getCategory().equals("SKIP")){
-                                        
-                                        //add it to the list of ops
+                                        break;
                                     }
                                     else{
-                                        System.out.println("ERROR " + scanner.getLine() + ": Extra token at end of line " + word.getLexeme() + " (" + word.getCategory() + ").");
+                                        
+                                        System.out.println("Error");
                                     }
                                 }
                             }
-                        }
-                        break;
-                    case "OUTPUT":
-                        op_num += 1;
-                        op.setOp(word.getLexeme());
-                        word = scanner.next_token(line, opcode);
- 
-                       
-                        if (!(word.getCategory().equals("CONST"))){
-                            System.out.println("ERROR " + scanner.getLine() + " Missing constant in output.");
-                            error = true;
                             break;
-                        }
-                        else{
-                            op.setSR1(word.getLexeme());
+                        case "LOADI":
+                            op_num += 1;
+                            op.setOp(word.getLexeme());
                             word = scanner.next_token(line, opcode);
-
-                        
-                            if (word.getCategory().equals("NEWLINE") || word.getCategory().equals("SKIP")){
-                                
-                                //add it to the list of ops
+                            if (word.getError() == true){
+                                error = true;
+                                errors += 1;
+                            }
+    
+                            if (!(word.getCategory().equals("CONST"))){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Missing constant in loadI.");
+                                error = true;
+                                errors += 1;
+                                break;
                             }
                             else{
-                                System.out.println("Error");
+                                op.setSR1(word.getLexeme());
+                                word = scanner.next_token(line, opcode);
+                                if (word.getError() == true){
+                                    error = true;
+                                    errors += 1;
+                                }
+    
+                                if (!(word.getCategory().equals("INTO"))){
+                                    System.out.print("ERROR " + scanner.getLine());
+                                    System.out.println(":        Missing '=>' in loadI");
+                                    error = true;
+                                    errors += 1;
+                                    break;
+                                }
+                                
+                                word = scanner.next_token(line, opcode);
+                                if (word.getError() == true){
+                                    error = true;
+                                    errors += 1;
+                                }
+
+                                if (!(word.getCategory().equals("REG"))){
+                                    System.out.print("ERROR " + scanner.getLine());
+                                    System.out.println(":        " + "Missing target register in loadI.");
+                                    error = true;
+                                    errors += 1;
+                                    break;
+                                }
+                                else{
+                                    op.setSR3(word.getLexeme());
+                                    word = scanner.next_token(line, opcode);
+                                    if (word.getError() == true){
+                                        error = true;
+                                        errors += 1;
+                                    }
+
+                                    if (word.getCategory().equals("NEWLINE") || (word.getCategory().equals("SKIP"))){
+                                        
+                                        //do nothing yet
+                                    }
+                                    else{
+                                        System.out.println("Error");
+                                    }
+                                }
                             }
+                            break;
+                        case "ARITHOP":
+                            op_num += 1;
+                            op.setOp(word.getLexeme());
+                            op_name = word.getLexeme();
+                            word = scanner.next_token(line, opcode);
+                            if (word.getError() == true){
+                                error = true;
+                                errors += 1;
+                            }
+                            
+                            if (!(word.getCategory().equals("REG"))){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Missing first source register in " + op_name + ".");
+                                error = true;
+                                errors += 1;
+                                break;
+                            }
+                            else{
+                                op.setSR1(word.getLexeme());
+                                word = scanner.next_token(line, opcode);
+                                if (word.getError() == true){
+                                    error = true;
+                                    errors += 1;
+                                }
+
+                                if (!(word.getCategory().equals("COMMA"))){
+                                    System.out.print("ERROR " + scanner.getLine());
+                                    System.out.println(":        " + "Missing comma in " + op_name + ".");
+                                    error = true;
+                                    errors += 1;
+                                    break;
+                                }
+                                word = scanner.next_token(line, opcode);
+                                if (word.getError() == true){
+                                    error = true;
+                                    errors += 1;
+                                }
+
+                                if (!(word.getCategory().equals("REG"))){
+                                    System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Missing second source register in " + op_name + ".");
+                                error = true;
+                                errors += 1;
+                                break;
+                                }
+                                else{
+                                    op.setSR2(word.getLexeme());
+                                    word = scanner.next_token(line, opcode);
+                                    if (word.getError() == true){
+                                        error = true;
+                                        errors += 1;
+                                    }
+
+                                    if (!(word.getCategory().equals("INTO"))){
+                                        System.out.print("ERROR" + scanner.getLine());
+                                        System.out.println(":\t" + "Missing '=>' in loadI.");
+                                        error = true;
+                                        errors += 1;
+                                        break;
+                                    }
+                                    word = scanner.next_token(line,opcode);
+                                    if (word.getError() == true){
+                                        error = true;
+                                        errors += 1;
+                                    }
+
+                                    if (!(word.getCategory().equals("REG"))){
+                                        System.out.print("ERROR " + scanner.getLine());
+                                        System.out.println(":        " + "Missing target register in " + op_name);
+                                        error = true;
+                                        errors += 1;
+                                        break;
+                                    }
+                                    else{
+                                        op.setSR3(word.getLexeme());
+                                        word = scanner.next_token(line, opcode);
+                                        if (word.getError() == true){
+                                            error = true;
+                                            errors += 1;
+                                        }
+                                        
+                                        if (word.getCategory().equals("NEWLINE") || word.getCategory().equals("SKIP")){
+                                            
+                                            //add it to the list of ops
+                                        }
+                                        else{
+                                            System.out.print("ERROR " + scanner.getLine());
+                                            System.out.println(":        " + "Extra token at end of line " + word.getLexeme() + " (" + word.getCategory() + ").");
+                                            error = true;
+                                            errors += 1;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "OUTPUT":
+                            op_num += 1;
+                            op.setOp(word.getLexeme());
+                            word = scanner.next_token(line, opcode);
+                            if (word.getError() == true){
+                                error = true;
+                                errors += 1;
+                            }
+    
+                        
+                            if (!(word.getCategory().equals("CONST"))){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Missing constant in output.");
+                                error = true;
+                                errors += 1;
+                                break;
+                            }
+                            else{
+                                op.setSR1(word.getLexeme());
+                                word = scanner.next_token(line, opcode);
+                                if (word.getError() == true){
+                                    error = true;
+                                    errors += 1;
+                                }
+
+                            
+                                if (word.getCategory().equals("NEWLINE") || word.getCategory().equals("SKIP")){
+                                    
+                                    //add it to the list of ops
+                                }
+                                else{
+                                    System.out.println("Error");
+                                }
+                            }
+                            break;
+                        case "NOP":
+                            word = scanner.next_token(line, opcode);
+                            op_num += 1;
+                            op.setOp(word.getLexeme());
+                            if (!word.getCategory().equals("NEWLINE") && !word.getCategory().equals("SKIP")){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Extra token at end of line " + word.getLexeme());
+                                error = true;
+                                errors += 1;
+                            }
+                            break;
+
+                        case "COMMA":
+                            if (op.opcode.equals("")){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Operation starts with an invalid opcode: " + word.getLexeme());
+                                error = true;
+                                errors += 1;
+                            }
+                            word = scanner.next_token(line, opcode);
+                            if (word.getError() == true){
+                                error = true;
+                                errors += 1;
+                            }
+    
+                            break;
+                        case "CONST":
+                            if (op.opcode.equals("")){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Operation starts with an invalid opcode: " + word.getLexeme());
+                                error = true;
+                                errors += 1;
+                            }
+                            word = scanner.next_token(line, opcode);
+                            if (word.getError() == true){
+                                error = true;
+                                errors += 1;
+                            }
+    
+                            break;
+                            
+                        case "REG":
+                            if (op.opcode.equals("")){
+                                System.out.print("ERROR " + scanner.getLine());
+                                System.out.println(":        " + "Operation starts with an invalid opcode: " + word.getLexeme());
+                                error = true;
+                                errors += 1;
+                            }
+                            word = scanner.next_token(line, opcode);
+                            if (word.getError() == true){
+                                error = true;
+                                errors += 1;
+                            }
+    
+                            break;
+                        default:
+                            
+                            break;
+
+                    }
+
+                    if (error == false && !(word.getCategory().equals("NEWLINE")) && !(word.getCategory().equals("SKIP"))){
+                        word = scanner.next_token(line, opcode);
+                        if (word.getError() == true){
+                            error = true;
+                            errors += 1;
                         }
-                        break;
-                    case "NOP":
-                        op_num += 1;
-                        op.setOp(word.getLexeme());
-                        
-
-                    default:
-                        
-                        break;
-
+                    }
+                    ir.addNode(op);
+                    
                 }
 
-                if (error == false && !(word.getCategory().equals("NEWLINE")) && !(word.getCategory().equals("SKIP"))){
-                    word = scanner.next_token(line, opcode);
+                scanner.setLine();
+                scanner.setPos();
+
+                if (error == true){
+                    found_error = true;
+                    lines += 1;
                 }
-                ir.addNode(op);
-                
+
             }
+            reader.close();    
+            file.close(); 
 
-            scanner.setLine();
-            scanner.setPos();
-
-            if (error == true){
-                found_error = true;
+            if (found_error == false && flag == 1){
+                ir.printNodes();
             }
+            else if (found_error == false && flag == 0){
+                System.out.print("Parse succeeded, finding " + op_num);
+                System.out.println(" ILOC operations.");
+            }
+            else{
+                System.out.println("");
+                System.out.print(name + " found " + errors);
+                System.out.print(" errors on " + lines);
+                System.out.println(" lines.");
+            }
+        
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.out.println("ERROR: could not open file");
+        }
 
-        }
-        reader.close();    
-        file.close(); 
 
-        if (found_error == false && flag == 1){
-            ir.printNodes();
-        }
-        else if (found_error == false && flag == 0){
-            System.out.println("Parse succeeded, finding " + op_num + " ILOC operations.");
-        }
-        else{
-            System.out.println("");
-            System.out.println("Due to syntax errors, run terminates.");
-        }
         
 
     }
+
 
     
 

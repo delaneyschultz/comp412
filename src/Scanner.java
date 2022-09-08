@@ -1,9 +1,8 @@
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
+
 
 public class Scanner{
 
@@ -16,8 +15,9 @@ public class Scanner{
         pos = 0;
     }
 
-    public int getLine(){
-        return line_num;
+    public String getLine(){
+        String l = String.valueOf(line_num);
+        return l;
     }
 
     public void setLine(){
@@ -27,6 +27,7 @@ public class Scanner{
     public void setPos(){
         pos = 0;
     }
+
 
     public boolean getOp(){
         return opcode;
@@ -41,26 +42,30 @@ public class Scanner{
 
     public Token next_token(String line, boolean opcode){
         Token token = new Token(line_num);
-        scan(token, line, opcode);
-
+        boolean found = scan(token, line, opcode);
+        token.setError(found);
         return token;
     }
 
-    public void scan(Token token, String line, boolean opcode){
-        
+    public boolean scan(Token token, String line, boolean opcode){
+
         char c = line.charAt(pos);
         String lexeme = "";
 
         lexeme += c;
-        find(token, line, opcode, lexeme);
+        boolean found = find(token, line, opcode, lexeme);
+
+        return found;
 
     }
 
-    public void find(Token token, String line, boolean opcode, String lexeme){
+    public boolean find(Token token, String line, boolean opcode, String lexeme){
         List<String> categories = Arrays.asList("MEMOP", "LOADI", "ARITHOP", "OUTPUT", "NOP", "CONST", "REG", "COMMA", "INTO", "ENDFILE", "NEWLINE", "SKIP");
         List<String> numbers = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
 
         char c;
+
+        boolean found_error = false;
 
         if (pos == line.length() || line.charAt(pos) == '\n'){
             token.setCategory(categories.get(10));
@@ -75,28 +80,32 @@ public class Scanner{
                     lexeme += c;    
                 }
 
-
                 switch (lexeme){
                     case "/":
                         if (line.charAt(pos+1) == '/'){
-                           
                             if (opcode == true){
-                                while(pos < line.length()){
+                                while(pos < line.length() - 1){
                                     pos += 1;
                                 }
                                 token.setCategory(categories.get(10)); 
                             }
                             else{
+                                while(pos < line.length() - 1){
+                                    pos += 1;
+                                }
                                 token.setCategory(categories.get(11)); 
                             }
                                
                         }
                         else{
-                            System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                             token.setCategory(categories.get(10));
                             token.setLexeme("");
+                            found_error = true;
+                            pos += 2;
                         }
-                        pos += 2;
+                        
                         break;
                     case "s":
                         if (line.substring(pos+1,pos+5).equals("tore")){
@@ -113,6 +122,13 @@ public class Scanner{
                             pos += 3;
                             opcode = true;
                             
+                        }
+                        else{
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
+                            token.setCategory(categories.get(10));
+                            token.setLexeme("");
+                            found_error = true;
                         }
                         break;
                     case "l":
@@ -138,6 +154,13 @@ public class Scanner{
                             pos += 6;
                             opcode = true;
                             
+                        }
+                        else{
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
+                            token.setCategory(categories.get(10));
+                            token.setLexeme("");
+                            found_error = true;
                         }
                         break;
                     case "r":
@@ -165,9 +188,11 @@ public class Scanner{
 
                         }
                         else{
-                            System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                             token.setCategory(categories.get(10));
                             token.setLexeme("");
+                            found_error = true;
                         }
                         
                         break;
@@ -179,9 +204,11 @@ public class Scanner{
                             opcode = true;
                         }
                         else{
-                            System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                             token.setCategory(categories.get(10));
                             token.setLexeme("");
+                            found_error = true;
                         }
                         break;
                     case "n":
@@ -194,9 +221,11 @@ public class Scanner{
 
                         }
                         else{
-                            System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                             token.setCategory(categories.get(10));
                             token.setLexeme("");
+                            found_error = true;
                         }
                         break;
                     case "a":
@@ -207,9 +236,11 @@ public class Scanner{
                         }
                         else{
                             lexeme += line.charAt(pos+1);
-                            System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                             token.setCategory(categories.get(10));
                             token.setLexeme("");
+                            found_error = true;
                         }
                         pos += 3;
             
@@ -221,9 +252,11 @@ public class Scanner{
                             opcode = true;
                         }
                         else{
-                            System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                            System.out.print("ERROR " + token.getLine());
+                            System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                             token.setCategory(categories.get(10));
                             token.setLexeme("");
+                            found_error = true;
                         }
                         pos += 6;
                 
@@ -256,8 +289,8 @@ public class Scanner{
                             break;
                         }
                         else{
-                            if (lexeme.isBlank()){
-                                while (lexeme.isBlank() && (pos != line.length()-1)){
+                            if (lexeme.trim().isEmpty()){
+                                while (lexeme.trim().isEmpty() && (pos != line.length()-1)){
                                     pos += 1;
                                     c = line.charAt(pos);
                                     lexeme = "";
@@ -278,9 +311,11 @@ public class Scanner{
                                 
                             }
                             else{
-                                System.out.println("ERROR " + token.getLine() + ": " + lexeme + " is not a valid word.");
+                                System.out.print("ERROR " + token.getLine());
+                                System.out.println(":\t\t" + "\"" + lexeme + "\"" + " is not a valid word.");
                                 token.setCategory(categories.get(10));
                                 token.setLexeme("");
+                                found_error = true;
                             }
 
                         }
@@ -289,10 +324,9 @@ public class Scanner{
     
         
         }
-
-        
-
         setOp(opcode);
+        return found_error;
     }
 
 }
+
